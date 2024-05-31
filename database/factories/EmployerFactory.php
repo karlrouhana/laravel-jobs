@@ -19,7 +19,7 @@ class EmployerFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'logo' => fake()->imageUrl(),
+            'logo' => 'https://assets.laracasts.com/images/mascot/larypeek.svg',
             'user_id' => User::factory()
         ];
     }

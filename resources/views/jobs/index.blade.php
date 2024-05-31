@@ -37,6 +37,9 @@
                 @foreach($jobs as $job)
                     <x-job-card-wide :$job></x-job-card-wide>
                 @endforeach
+                @foreach($featuredJobs as $job)
+                        <x-job-card-wide :$job></x-job-card-wide>
+                    @endforeach
             </div>
         </section>
     </div>

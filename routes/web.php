@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [JobController::class, 'index']);
 
-Route::get('/jobs/create', [JobController::class, 'create'])->middleware('auth');
-Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
-
 Route::get('/search', SearchController::class);
 Route::get('/tags/{tag}', TagController::class);
 
@@ -24,5 +21,18 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [SessionController::class, 'store']);
 });
 
-Route::delete('/logout', [SessionController::class, 'destroy'])->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('/jobs/create', [JobController::class, 'create']);
+    Route::post('/jobs', [JobController::class, 'store']);
+    Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])
+        ->can('edit', 'job');
+
+    Route::patch('/jobs/{job}', [JobController::class, 'update']);
+    Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
+
+    Route::delete('/logout', [SessionController::class, 'destroy']);
+});
+
+Route::get('/jobs/{job}', [JobController::class, 'show']);
+
 

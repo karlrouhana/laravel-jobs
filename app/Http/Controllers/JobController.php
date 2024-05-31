@@ -7,6 +7,7 @@ use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class JobController extends Controller
@@ -19,8 +20,8 @@ class JobController extends Controller
         $jobs = Job::latest()->with(['employer', 'tags'])->get()->groupBy('featured');
 
         return view('jobs.index', [
-            'jobs' => $jobs[0],
-            'featuredJobs' => $jobs[1],
+            'jobs' => $jobs->get(0, collect()), // Non-featured jobs
+            'featuredJobs' => $jobs->get(1, collect()), // Featured jobs
             'tags' => Tag::all(),
         ]);
     }
@@ -56,6 +57,45 @@ class JobController extends Controller
                 $job->tag($tag);
             }
         }
+
+        return redirect('/');
+    }
+
+    public function show(Job $job){
+
+        return view('jobs.show',[
+            'job'=> $job
+        ]);
+    }
+
+    public function edit(Job $job){
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+    public function update(Job $job){
+        $attributes = request()->validate([
+            'title' => ['required'],
+            'salary' => ['required'],
+            'location' => ['required'],
+            'schedule' => ['required', Rule::in(['Part Time', 'Full Time'])],
+            'url' => ['required', 'active_url'],
+            'tags' => ['nullable'],
+        ]);
+
+        $attributes['featured'] = request()->has('featured');
+
+        $job->update(Arr::except($attributes, 'tags'));
+        $job->tags()->detach();
+
+        if ($attributes['tags'] ?? false) {
+            foreach (explode(',', $attributes['tags']) as $tag) {
+                $job->tag($tag);
+            }
+        }
+        return redirect('/jobs/' . $job->id);
+    }
+    public function destroy(Job $job){
+        $job->delete();
 
         return redirect('/');
     }
