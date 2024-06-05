@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\CompanyJobsController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\RegisteredUserController;
 use App\Http\Controllers\SearchController;
@@ -9,9 +11,11 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [JobController::class, 'index']);
+Route::get('/companies', CompaniesController::class);
 
 Route::get('/search', SearchController::class);
 Route::get('/tags/{tag}', TagController::class);
+Route::get('/companies/{company}', CompanyJobsController::class);
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create']);
